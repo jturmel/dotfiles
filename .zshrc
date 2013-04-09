@@ -57,10 +57,15 @@ export PATH="/usr/local/heroku/bin:$PATH"
 
 if [[ -s "/Users/jturmel/.rvm/scripts/rvm"  ]] ; then source "/Users/jturmel/.rvm/scripts/rvm" ; fi
 
-source /usr/local/bin/powerline/powerline/bindings/zsh/powerline.zsh
+#source /usr/local/bin/powerline/powerline/bindings/zsh/powerline.zsh
+source /Users/jturmel/.pythonbrew/pythons/Python-2.7.3/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
 
 rvm use 1.9.3 >> /dev/null
 
 alias timestamp="date +%s"
 
 alias cph="history | tail -n 1 | sed -E 's/^[0-9]+ +//' | tr -d '\n' | pbcopy"
+
+#alias git=hub
+
+VIRTUAL_ENV_DISABLE_PROMPT=1
