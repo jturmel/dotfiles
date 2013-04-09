@@ -1,0 +1,55 @@
+{
+	"default_module": "powerline.segments.common",
+	"segment_data": {
+		"uptime": {
+			"before": "⇑  "
+		},
+        "external_ip": {
+            "before": "ⓦ  "
+        },
+		"date": {
+			"before": ""
+		},
+		"email_imap_alert": {
+			"before": "✉ ",
+			"args": {
+				"username": "",
+				"password": ""
+			}
+		}
+	},
+	"segments": {
+		"right": [
+			{
+				"name": "uptime",
+				"priority": 50
+			},
+			{
+				"name": "external_ip",
+				"priority": 50
+			},
+			{
+				"name": "weather",
+				"priority": 50,
+                "args": {
+                    "unit": "F",
+                    "location_query": "Edmond, OK"
+                }
+			},
+			{
+				"name": "date"
+			},
+			{
+				"name": "date",
+				"args": {
+					"format": "%H:%M",
+					"istime": true
+				}
+			},
+			{
+				"name": "email_imap_alert",
+				"priority": 10
+			}
+		]
+	}
+}
