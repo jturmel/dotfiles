@@ -58,7 +58,7 @@ export PATH="/usr/local/heroku/bin:$PATH"
 if [[ -s "/Users/jturmel/.rvm/scripts/rvm"  ]] ; then source "/Users/jturmel/.rvm/scripts/rvm" ; fi
 
 #source /usr/local/bin/powerline/powerline/bindings/zsh/powerline.zsh
-source /Users/jturmel/.pythonbrew/pythons/Python-2.7.3/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
+#source /Users/jturmel/.pythonbrew/pythons/Python-2.7.3/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
 
 rvm use 1.9.3 >> /dev/null
 
@@ -68,4 +68,18 @@ alias cph="history | tail -n 1 | sed -E 's/^[0-9]+ +//' | tr -d '\n' | pbcopy"
 
 #alias git=hub
 
-VIRTUAL_ENV_DISABLE_PROMPT=1
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+export PSALTY_USER=jturmel
+
+eval "$(/Users/jturmel/Development/yv/bin/yv init -)"
+
+GRADLE_HOME=/Users/jturmel/Development/gradle
+
+export GRADLE_HOME
+export PATH=$PATH:$GRADLE_HOME/bin
+
+export PATH=$PATH:/Applications/Android\ Studio.app/sdk/tools:/Applications/Android\ Studio.app/sdk/platform-tools
+
+# The next line updates PATH for the Google Cloud SDK.
+export PATH=/Users/jturmel/google-cloud-sdk/bin:$PATH
