@@ -83,3 +83,7 @@ export PATH=$PATH:/Applications/Android\ Studio.app/sdk/tools:/Applications/Andr
 
 # The next line updates PATH for the Google Cloud SDK.
 export PATH=/Users/jturmel/google-cloud-sdk/bin:$PATH
+
+export EDITOR=vim
+
+source ~/.tmuxinator.zsh
