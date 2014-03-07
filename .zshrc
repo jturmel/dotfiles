@@ -14,76 +14,79 @@ ZSH_THEME="robbyrussell"
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
 
-# Comment this out to disable bi-weekly auto-update checks
+# Uncomment this to disable bi-weekly auto-update checks
 # DISABLE_AUTO_UPDATE="true"
 
-# Uncomment to change how many often would you like to wait before auto-updates occur? (in days)
+# Uncomment to change how often before auto-updates occur? (in days)
 # export UPDATE_ZSH_DAYS=13
 
 # Uncomment following line if you want to disable colors in ls
 # DISABLE_LS_COLORS="true"
 
 # Uncomment following line if you want to disable autosetting terminal title.
-# DISABLE_AUTO_TITLE="true"
+DISABLE_AUTO_TITLE="true"
+
+# Uncomment following line if you want to disable command autocorrection
+# DISABLE_CORRECTION="true"
 
 # Uncomment following line if you want red dots to be displayed while waiting for completion
 # COMPLETION_WAITING_DOTS="true"
 
+# Uncomment following line if you want to disable marking untracked files under
+# VCS as dirty. This makes repository status check for large repositories much,
+# much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment following line if you want to  shown in the command execution time stamp 
+# in the history command output. The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|
+# yyyy-mm-dd
+# HIST_STAMPS="mm/dd/yyyy"
+
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git osx vi-mode keybindings)
+plugins=(git ruby brew cp)
 
 source $ZSH/oh-my-zsh.sh
 
-# Customize to your needs...
-export PATH=/opt/local/bin:/usr/local/git/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin
+# User configuration
 
-[[ -s $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/git/bin:$PATH"
+# export MANPATH="/usr/local/man:$MANPATH"
 
-source $HOME/.bashrc
+# Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+    export EDITOR='vim'
+else
+    export EDITOR='vim'
+fi
 
-source $HOME/.bash_profile
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
 
-#bindkey "^[OA" up-line-or-search
+# ssh
+# export SSH_KEY_PATH="~/.ssh/dsa_id"
 
-# Appends every command to the history file once it is executed
-setopt inc_append_history
-# # Reloads the history whenever you use it
+# Reloads the history whenever you use it
 setopt share_history
 
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
+path+=/Applications/Android\ Studio.app/sdk/platform-tools
 
-if [[ -s "/Users/jturmel/.rvm/scripts/rvm"  ]] ; then source "/Users/jturmel/.rvm/scripts/rvm" ; fi
+# Setting up the VirtualEnv
+export WORKON_HOME=$HOME/.virtualenvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python2.7
+export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+export PIP_VIRTUALENV_BASE=$WORKON_HOME
+export PIP_RESPECT_VIRTUALENV=true
 
-#source /usr/local/bin/powerline/powerline/bindings/zsh/powerline.zsh
-#source /Users/jturmel/.pythonbrew/pythons/Python-2.7.3/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
+if [[ -r /usr/local/bin/virtualenvwrapper.sh ]]; then
+    source /usr/local/bin/virtualenvwrapper.sh
+else
+    echo "WARNING: Can't find virtualenvwrapper.sh"
+fi
 
-rvm use 1.9.3 >> /dev/null
+export PATH=$PATH:/usr/local/bin/npm
 
-alias timestamp="date +%s"
-
-alias cph="history | tail -n 1 | sed -E 's/^[0-9]+ +//' | tr -d '\n' | pbcopy"
-
-#alias git=hub
-
-export VIRTUAL_ENV_DISABLE_PROMPT=1
-
-export PSALTY_USER=jturmel
-
-eval "$(/Users/jturmel/Development/yv/bin/yv init -)"
-
-GRADLE_HOME=/Users/jturmel/Development/gradle
-
-export GRADLE_HOME
-export PATH=$PATH:$GRADLE_HOME/bin
-
-export PATH=$PATH:/Applications/Android\ Studio.app/sdk/tools:/Applications/Android\ Studio.app/sdk/platform-tools
-
-# The next line updates PATH for the Google Cloud SDK.
-export PATH=/Users/jturmel/google-cloud-sdk/bin:$PATH
-
-export EDITOR=vim
+export PATH=$PATH:/usr/local/Cellar/ruby/2.1.0/bin
 
 source ~/.tmuxinator.zsh

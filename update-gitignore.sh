@@ -15,6 +15,9 @@ cat Global/OSX.gitignore >> ~/.gitignore
 echo "\n#vim\n" >> ~/.gitignore
 echo "_vimrc_local.vim" >> ~/.gitignore
 
+echo "\n#python\n" >> ~/.gitignore
+echo ".ropeproject" >> ~/.gitignore
+
 git config --global core.excludesfile ~/.gitignore
 
 - rm ~/dev/dotfiles/.gitignore

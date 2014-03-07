@@ -49,3 +49,7 @@ Icon
 #vim
 
 _vimrc_local.vim
+
+#python
+
+.ropeproject
