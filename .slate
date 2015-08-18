@@ -55,15 +55,30 @@ bind e:cmd;shift focus ${editor}
 bind b:cmd;shift focus ${browser}
 bind t:cmd;shift focus ${terminal}
 
-alias full          move screenOriginX;screenOriginY                  screenSizeX;screenSizeY
-alias lefthalf      move screenOriginX;screenOriginY                  screenSizeX/2;screenSizeY
-alias righthalf     move screenOriginX+screenSizeX/2;screenOriginY    screenSizeX/2;screenSizeY
-alias center        move screenOriginX;screenOriginY                  screenSizeX;screenSizeY*0.97
+alias full          move screenOriginX;screenOriginY                              screenSizeX;screenSizeY
+alias lefthalf      move screenOriginX;screenOriginY                              screenSizeX/2;screenSizeY
+alias leftthird     move screenOriginX;screenOriginY                              screenSizeX/3;screenSizeY
+alias righthalf     move screenOriginX+screenSizeX/2;screenOriginY                screenSizeX/2;screenSizeY
+alias right2third   move screenOriginX+screenSizeX/3*2;screenOriginY              screenSizeX/3*2;screenSizeY
+alias center        move screenOriginX;screenOriginY                              screenSizeX;screenSizeY*0.97
+alias nw            move screenOriginX;screenOriginY                              screenSizeX/2;screenSizeY/2
+alias ne            move screenOriginX+screenSizeX/2;screenOriginY                screenSizeX/2;screenSizeY/2
+alias sw            move screenOriginX;screenOriginY+screenSizeY/2                screenSizeX/2;screenSizeY/2
+alias se            move screenOriginX+screenSizeX/2;screenOriginY+screenSizeY/2  screenSizeX/2;screenSizeY/2
+#alias se            move screenOriginX+screenSizeX/2;screenOriginY+screenSizeY/2;   screenSizeX/2;screenSizeY/2
+alias ns            move screenOriginX+screenSizeX/5;screenOriginY                screenSizeX/5*3;screenSizeY
 
 bind t:cmd;alt ${center}
 bind l:cmd;alt ${lefthalf}
+bind k:cmd;alt ${leftthird}
+bind t:cmd;alt ${right2third}
 bind r:cmd;alt ${righthalf}
 bind f:cmd;alt ${full}
+bind 1:cmd;alt ${nw}
+bind 2:cmd;alt ${ne}
+bind 3:cmd;alt ${sw}
+bind 4:cmd;alt ${se}
+bind 5:cmd;alt ${ns}
 
 bind r:cmd;shift grid padding:5 0:8,8
 

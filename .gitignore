@@ -1,3 +1,8 @@
+node_modules
+dist
+.tmp
+.sass-cache
+bower_components
 #JetBrains
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode
@@ -37,7 +42,8 @@ com_crashlytics_export_strings.xml
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*

@@ -70,23 +70,47 @@ fi
 # Reloads the history whenever you use it
 setopt share_history
 
-path+=/Applications/Android\ Studio.app/sdk/platform-tools
+export PYTHONPATH=/lib/python2.7/site-packages:$PYTHONPATH
+export PYENV_VERSION=2.7.10
 
 # Setting up the VirtualEnv
 export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python2.7
+#export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
+export VIRTUALENVWRAPPER_PYTHON=/Users/jturmel/.pyenv/shims/python
 export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+source /bin/virtualenvwrapper.sh
+
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true
 
-if [[ -r /usr/local/bin/virtualenvwrapper.sh ]]; then
-    source /usr/local/bin/virtualenvwrapper.sh
-else
-    echo "WARNING: Can't find virtualenvwrapper.sh"
-fi
-
-export PATH=$PATH:/usr/local/bin/npm
-
-export PATH=$PATH:/usr/local/Cellar/ruby/2.1.0/bin
+export PATH=$PATH:/usr/local/sbin/
 
 source ~/.tmuxinator.zsh
+
+export PATH=$PATH:/Applications/Android\ Studio.app/sdk/tools/:/Applications/Android\ Studio.app/sdk/platform-tools/
+
+source $HOME/.nvm/nvm.sh
+nvm use default
+
+export GAE_SDK_ROOT=/Users/jturmel/google-cloud-sdk/platform/google_appengine
+
+export PATH=$PATH:~/Library/android-sdk-macosx/platform-tools
+export PATH=$PATH:~/Library/android-sdk-macosx/tools
+
+export ANDROID_HOME=~/Library/android-sdk-macosx/tools
+
+export PYTHONPATH=$PYTHONPATH:$GAE_SDK_ROOT
+
+# The next line updates PATH for the Google Cloud SDK.
+source '/Users/jturmel/google-cloud-sdk/path.zsh.inc'
+
+# The next line enables zsh completion for gcloud.
+source '/Users/jturmel/google-cloud-sdk/completion.zsh.inc'
+
+
+eval "$(rbenv init -)"
+
+eval "$(docker-machine env tt)"
+
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+
