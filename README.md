@@ -1,5 +1,6 @@
-My configuration "dot" files.
+dotfiles
+========
 
 * MacOS
-* Omarchy
+* Linux
 
