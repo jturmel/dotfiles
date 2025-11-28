@@ -116,4 +116,4 @@ source ~/.commonrc
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 # [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-eval "$(oh-my-posh init zsh)"
+eval "$(oh-my-posh init zsh --config ~/.omp.quick-term-as-dracula.json)"
