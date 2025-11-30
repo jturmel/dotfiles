@@ -117,3 +117,9 @@ source ~/.commonrc
 # [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 eval "$(oh-my-posh init zsh --config ~/.omp.quick-term-as-dracula.json)"
+
+## [Completion]
+## Completion scripts setup. Remove the following line to uninstall
+[[ -f /home/jt/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/jt/.config/.dart-cli-completion/zsh-config.zsh || true
+## [/Completion]
+

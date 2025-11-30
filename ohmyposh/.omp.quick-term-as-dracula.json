@@ -1,19 +1,23 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "palette": {
-    "black": "#000000",
-
     "dracula_background": "#282a36",
-    "dracula_foreground": "#f8f8f2",
     "dracula_current-line": "#44475a",
-    "dracula_yellow": "#f1fa8c",
+    "dracula_foreground": "#f8f8f2",
     "dracula_comment": "#6272a4",
     "dracula_cyan": "#8be9fd",
     "dracula_green": "#50fa7b",
     "dracula_orange": "#ffb86c",
     "dracula_pink": "#ff79c6",
     "dracula_purple": "#bd93f9",
-    "dracula_red": "#ff5555"
+    "dracula_red": "#ff5555",
+    "dracula_yellow": "#f1fa8c",
+
+    "dracula_functional-red": "#de5735",
+    "dracula_functional-orange": "#a39514",
+    "dracula_functional-green": "#089108",
+    "dracula_functional-cyan": "#0081d6",
+    "dracula_functional-purple": "#815cd6"
   },
   "blocks": [
     {
@@ -21,7 +25,7 @@
       "newline": true,
       "segments": [
         {
-          "background": "p:dracula_current-line",
+          "background": "p:dracula_comment",
           "foreground": "p:dracula_foreground",
           "properties": {
             "alpine": "\uf300",
@@ -41,20 +45,12 @@
             "windows": "\ue70f"
           },
           "style": "diamond",
-          "leading_diamond": "\u256d\u2500\ue0b2",
+          "leading_diamond": "<p:dracula_comment,p:dracula_background>\u256d\u2500</>\ue0b2",
           "template": " {{ .Icon }} ",
           "type": "os"
         },
         {
-          "background": "p:dracula_foreground",
-          "foreground": "p:dracula_background",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b0",
-          "template": " {{ .UserName }} ",
-          "type": "session"
-        },
-        {
-          "background": "p:dracula_comment",
+          "background": "p:dracula_current-line",
           "foreground": "p:dracula_foreground",
           "properties": {
             "style": "agnoster_short",
@@ -71,10 +67,16 @@
           "background": "p:dracula_green",
           "foreground": "p:dracula_background",
           "background_templates": [
-            "{{ if or (.Working.Changed) (.Staging.Changed) }}p:dracula_orange{{ end }}",
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}p:dracula_red{{ end }}",
             "{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:dracula_red{{ end }}",
             "{{ if gt .Ahead 0 }}p:dracula_red{{ end }}",
             "{{ if gt .Behind 0 }}p:dracula_red{{ end }}"
+          ],
+          "foreground_templates": [
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}p:dracula_foreground{{ end }}",
+            "{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:dracula_foreground{{ end }}",
+            "{{ if gt .Ahead 0 }}p:dracula_foreground{{ end }}",
+            "{{ if gt .Behind 0 }}p:dracula_foreground{{ end }}"
           ],
           "properties": {
             "branch_template": "{{ trunc 25 .Branch }}",
@@ -85,7 +87,7 @@
           },
           "style": "diamond",
           "leading_diamond": "<transparent,background>\ue0b0</>",
-          "template": " {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} <transparent>\ue0b1</> <#121318>\uf044 {{ .Working.String }}</>{{ end }}{{ if .Staging.Changed }} <transparent>\ue0b1</> <#121318>\uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} <transparent>\ue0b1</> <#121318>\ueb4b {{ .StashCount }}</>{{ end }} ",
+          "template": " {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} <transparent>\ue0b1</> \uf044 {{ .Working.String }}{{ end }}{{ if .Staging.Changed }} <transparent>\ue0b1</> <#121318>\uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} <transparent>\ue0b1</> <#121318>\ueb4b {{ .StashCount }}</>{{ end }} ",
           "trailing_diamond": "\ue0b0",
           "type": "git"
         }
@@ -96,7 +98,7 @@
       "alignment": "right",
       "segments": [
         {
-          "background": "p:dracula_comment",
+          "background": "p:dracula_current-line",
           "foreground": "p:dracula_foreground",
           "properties": {
             "style": "austin",
@@ -109,7 +111,7 @@
           "type": "executiontime"
         },
         {
-          "background": "p:dracula_current-line",
+          "background": "p:dracula_comment",
           "foreground": "p:dracula_foreground",
           "properties": {
             "time_format": "15:04"
@@ -128,9 +130,9 @@
       "newline": true,
       "segments": [
         {
-          "foreground": "p:dracula_current-line",
+          "foreground": "p:dracula_comment",
           "style": "plain",
-          "template": "\u2570\u2500 <p:dracula_comment>{{ if .Root }}#{{else}}${{end}}</>",
+          "template": "\u2570\u2500 <p:dracula_foreground>{{ if .Root }}#{{else}}${{end}}</>",
           "type": "text"
         }
       ],
