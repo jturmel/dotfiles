@@ -1,6 +1,2 @@
 dotfiles
 ========
-
-* MacOS
-* Linux
-
