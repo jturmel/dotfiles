@@ -1,2 +1,6 @@
 alias lzd=lazydocker
 alias lzg=lazygit
+
+export BASECAMP_NOTIFIER_ACCOUNT_ID=4413376
+export BASECAMP_NOTIFIER_CHROME_PROFILE="Profile 1"
+
