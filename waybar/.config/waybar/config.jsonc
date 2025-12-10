@@ -5,7 +5,7 @@
   "spacing": 0,
   "height": 26,
   "modules-left": ["custom/omarchy", "hyprland/workspaces"],
-  "modules-center": ["clock", "custom/update", "custom/screenrecording-indicator"],
+  "modules-center": ["clock", "custom/basecamp", "custom/update", "custom/screenrecording-indicator"],
   "modules-right": [
     "group/tray-expander",
     "bluetooth",
@@ -52,7 +52,6 @@
     "signal": 7,
     "interval": 21600
   },
-
   "cpu": {
     "interval": 5,
     "format": "󰍛",
@@ -135,5 +134,11 @@
   "tray": {
     "icon-size": 12,
     "spacing": 17
+  },
+  "custom/basecamp": {
+    "format": "{}",
+    "return-type": "json",
+    "exec": "basecamp-notifier",
+    "on-click": "omarchy-launch-webapp 'https://3.basecamp.com/4413376/projects' --profile-directory='Profile 1'"
   }
 }

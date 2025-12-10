@@ -118,3 +118,5 @@ eval "$(oh-my-posh init zsh --config ~/.omp.quick-term-as-dracula.json)"
 [[ -f /home/jt/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/jt/.config/.dart-cli-completion/zsh-config.zsh || true
 ## [/Completion]
 
+export PATH=~/.local/bin:$PATH
+
