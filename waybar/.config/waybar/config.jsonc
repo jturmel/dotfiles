@@ -139,6 +139,6 @@
     "format": "{}",
     "return-type": "json",
     "exec": "basecamp-notifier",
-    "on-click": "omarchy-launch-webapp 'https://3.basecamp.com/4413376/projects' --profile-directory='Profile 1'"
+    "on-click": "gio launch ~/.local/share/applications/Basecamp.desktop"
   }
 }
