@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Google Messages
+Comment=Google Messages
+Exec=omarchy-launch-or-focus-webapp chrome-google-messages "https://messages.google.com/web/conversations --profile-directory='Default'"
+Terminal=false
+Type=Application
+Icon=/home/jt/.local/share/applications/icons/Google Messages.png
+StartupNotify=true

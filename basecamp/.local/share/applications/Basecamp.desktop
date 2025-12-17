@@ -2,7 +2,7 @@
 Version=1.0
 Name=Basecamp
 Comment=Basecamp
-Exec=omarchy-launch-or-focus-webapp chrome-basecamp "https://3.basecamp.com/4413376/projects --profile-directory='Profile 1'"
+Exec=omarchy-launch-or-focus-webapp chrome-basecamp "https://3.basecamp.com/4413376/projects --profile-directory='Work'"
 Terminal=false
 Type=Application
 Icon=/home/jt/.local/share/applications/icons/Basecamp.png
