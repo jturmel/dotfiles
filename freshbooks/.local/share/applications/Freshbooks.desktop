@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Freshbooks
+Comment=Freshbooks
+Exec=omarchy-launch-or-focus-webapp "^chrome-my.freshbooks.com.*$" "https://my.freshbooks.com/ --profile-directory='Work'"
+Terminal=false
+Type=Application
+Icon=/home/jt/.local/share/applications/icons/Freshbooks.png
+StartupNotify=true
