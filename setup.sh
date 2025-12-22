@@ -14,6 +14,7 @@ DOTFILES_DIR="."
 TARGET_DIR="$HOME"
 BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 STOW_CMD="stow"
+BACKGROUNDS_TARGET_DIR="$HOME/.config/omarchy/themes/dracula/backgrounds/"
 
 # Folders inside $DOTFILES_DIR to ignore (space separated)
 IGNORE_DIRS=".git .github .vscode .idea"
@@ -35,6 +36,23 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 # Check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
+}
+
+cleanup_existing_theme_backgrounds() {
+  # Only proceed if the directory actually exists
+  if [ -d "$BACKGROUNDS_TARGET_DIR" ]; then
+    # Use subshell ( ) to change directory without affecting the rest of the script
+    (
+      cd "$BACKGROUNDS_TARGET_DIR" || exit
+      shopt -s nullglob
+      for file in base* dracula*; do
+        [ -f "$file" ] && rm "$file"
+      done
+    )
+    echo "Theme background cleanup finished in $BACKGROUNDS_TARGET_DIR"
+  else
+    echo "Directory $BACKGROUNDS_TARGET_DIR not found; skipping theme background cleanup."
+  fi
 }
 
 # Resolve conflicts for a specific package
@@ -88,6 +106,8 @@ main() {
         log_error "Dotfiles directory not found at $DOTFILES_DIR"
         exit 1
     fi
+
+    cleanup_existing_theme_backgrounds
 
     cd "$DOTFILES_DIR"
 
