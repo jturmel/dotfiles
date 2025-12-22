@@ -4,9 +4,9 @@ After=graphical-session.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/%u/wallpaper-rotate.sh
+ExecStart=/home/%u/.local/share/omarchy/bin/omarchy-theme-bg-next
 KillMode=none
-PassEnvironment=WAYLAND_DISPLAY XDG_RUNTIME_DIR
+PassEnvironment=WAYLAND_DISPLAY XDG_RUNTIME_DIR DBUS_SESSION_BUS_ADDRESS
 
 [Install]
 WantedBy=default.target
