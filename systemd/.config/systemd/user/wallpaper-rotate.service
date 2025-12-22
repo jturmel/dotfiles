@@ -1,0 +1,13 @@
+[Unit]
+Description=Rotate Wallpaper
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/%u/wallpaper-rotate.sh
+KillMode=none
+PassEnvironment=WAYLAND_DISPLAY XDG_RUNTIME_DIR
+
+[Install]
+WantedBy=default.target
+
