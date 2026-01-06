@@ -5,7 +5,7 @@
   "spacing": 0,
   "height": 26,
   "modules-left": ["custom/omarchy", "hyprland/workspaces"],
-  "modules-center": ["clock", "custom/basecamp", "custom/update", "custom/screenrecording-indicator"],
+  "modules-center": ["clock", "custom/update", "custom/screenrecording-indicator", "custom/basecamp"],
   "modules-right": [
     "group/tray-expander",
     "bluetooth",
@@ -136,9 +136,13 @@
     "spacing": 17
   },
   "custom/basecamp": {
-    "format": "{}",
+    "format": "{}", 
     "return-type": "json",
-    "exec": "basecamp-notifier",
-    "on-click": "gio launch ~/.local/share/applications/Basecamp.desktop"
+    "exec": "cat /tmp/waybar_basecamp.json",
+    "interval": 10,
+    "signal": 8,
+    "on-click": "gio launch ~/.local/share/applications/Basecamp.desktop",
+    "on-click-right": "systemctl --user start waybar-basecamp.service",
+    "tooltip": true
   }
 }
