@@ -141,7 +141,7 @@
     "exec": "cat /tmp/waybar_basecamp.json",
     "interval": 10,
     "signal": 8,
-    "on-click": "gio launch ~/.local/share/applications/Basecamp.desktop",
+    "on-click": "omarchy-launch-or-focus-webapp chrome-basecamp \"https://3.basecamp.com/4413376/projects --profile-directory='Work'\"",
     "on-click-right": "systemctl --user start waybar-basecamp.service",
     "tooltip": true
   }
