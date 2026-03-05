@@ -14,13 +14,17 @@
       "variant": "high"
     },
     "librarian": {
-      "model": "opencode-go/glm-5",
+      "model": "opencode/minimax-m2.5-free",
       "fallback_models": [
-        "opencode/glm-5"
+        "github-copilot/gemini-3-flash-preview",
+        "opencode/big-pickle"
       ]
     },
     "explore": {
-      "model": "github-copilot/gemini-3-flash-preview"
+      "model": "github-copilot/grok-code-fast-1",
+      "fallback_models": [
+        "github-copilot/claude-haiku-4-5"
+      ]
     },
     "multimodal-looker": {
       "model": "github-copilot/gemini-3-flash-preview"
@@ -38,7 +42,7 @@
       "variant": "medium"
     },
     "atlas": {
-      "model": "opencode-go/kimi-k2.5"
+      "model": "opencode-go/kimi-k2.5",
       "fallback_models": [
         "opencode/kimi-k2.5"
       ]
