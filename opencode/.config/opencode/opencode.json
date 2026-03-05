@@ -4,5 +4,23 @@
   "autoupdate": "notify",
   "plugin": [
     "oh-my-opencode@latest"
-  ]
+  ],
+  "mcp": {
+    "cloudflare": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "oauth": {}
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ]
+    },
+    "crawl4ai": {
+      "type": "remote",
+      "url": "http://localhost:11235/mcp/sse"
+    }
+  }
 }
