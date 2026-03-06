@@ -3,8 +3,16 @@
   "theme": "system",
   "autoupdate": "notify",
   "plugin": [
-    "oh-my-opencode@latest"
+    "oh-my-opencode@latest",
+    "opencode-gemini-auth@latest"
   ],
+  "provider": {
+    "google": {
+      "options": {
+        "projectId": "turmel"
+      }
+    }
+  },
   "formatter": {
     "ruff": {
       "enabled": true
@@ -12,10 +20,15 @@
   },
   "mcp": {
     "cloudflare": {
-      "type": "remote",
       "enabled": false,
+      "type": "remote",
       "url": "https://mcp.cloudflare.com/mcp",
       "oauth": {}
+    },
+    "crawl4ai": {
+      "enabled": false,
+      "type": "remote",
+      "url": "http://localhost:11235/mcp/sse"
     },
     "playwright": {
       "type": "local",
@@ -23,11 +36,6 @@
         "npx",
         "@playwright/mcp@latest"
       ]
-    },
-    "crawl4ai": {
-      "type": "remote",
-      "enabled": false,
-      "url": "http://localhost:11235/mcp/sse"
     }
   }
 }

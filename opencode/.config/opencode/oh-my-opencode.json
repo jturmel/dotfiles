@@ -16,7 +16,7 @@
     "librarian": {
       "model": "opencode/minimax-m2.5-free",
       "fallback_models": [
-        "github-copilot/gemini-3-flash-preview",
+        "google/gemini-3-flash-preview",
         "opencode/big-pickle"
       ]
     },
@@ -27,7 +27,7 @@
       ]
     },
     "multimodal-looker": {
-      "model": "github-copilot/gemini-3-flash-preview"
+      "model": "google/gemini-3-flash-preview"
     },
     "prometheus": {
       "model": "github-copilot/claude-opus-4.5",
@@ -56,7 +56,7 @@
   },
   "categories": {
     "visual-engineering": {
-      "model": "github-copilot/gemini-3.1-pro-preview",
+      "model": "google/gemini-3.1-pro-preview",
       "variant": "high"
     },
     "ultrabrain": {
@@ -68,7 +68,7 @@
       "variant": "medium"
     },
     "artistry": {
-      "model": "github-copilot/gemini-3.1-pro-preview",
+      "model": "google/gemini-3.1-pro-preview",
       "variant": "high"
     },
     "quick": {
@@ -81,7 +81,7 @@
       "model": "github-copilot/claude-sonnet-4.5"
     },
     "writing": {
-      "model": "github-copilot/gemini-3-flash-preview"
+      "model": "google/gemini-3-flash-preview"
     }
   }
 }
