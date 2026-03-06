@@ -5,9 +5,15 @@
   "plugin": [
     "oh-my-opencode@latest"
   ],
+  "formatter": {
+    "ruff": {
+      "enabled": true
+    }
+  },
   "mcp": {
     "cloudflare": {
       "type": "remote",
+      "enabled": false,
       "url": "https://mcp.cloudflare.com/mcp",
       "oauth": {}
     },
@@ -20,6 +26,7 @@
     },
     "crawl4ai": {
       "type": "remote",
+      "enabled": false,
       "url": "http://localhost:11235/mcp/sse"
     }
   }
