@@ -122,3 +122,8 @@ eval "$(oh-my-posh init zsh --config ~/.omp.quick-term-as-dracula.json)"
 
 export PATH=~/.local/bin:$PATH
 
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/jt/.lmstudio/bin"
+# End of LM Studio CLI section
+
