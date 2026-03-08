@@ -1,0 +1,10 @@
+# Internal tooling directories
+.sisyphus/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
