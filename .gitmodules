@@ -1,0 +1,3 @@
+[submodule "opencode/.config/opencode/skills"]
+	path = opencode/.config/opencode/skills
+	url = git@github.com:jturmel/skills.git
