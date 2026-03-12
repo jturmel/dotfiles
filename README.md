@@ -19,7 +19,7 @@ cd dotfiles
 ./setup.sh
 
 # Or install specific packages only
-./setup.sh zsh git hypr
+./setup.sh zsh git hypr nvim
 ```
 
 Existing files are backed up to `~/.dotfiles_backup_YYYYMMDD_HHMMSS/`.
@@ -34,6 +34,7 @@ Each directory is a stow package that mirrors the target path in `~`:
 | `git/` | Git config (`~/.config/git/`) |
 | `hypr/` | Hyprland WM (keybinds, monitors, windows) |
 | `kitty/` | Kitty terminal |
+| `nvim/` | Extra Neovim plugin files layered into `~/.config/nvim/` |
 | `ohmyposh/` | Oh My Posh prompt theme (Dracula) |
 | `omarchy/` | Omarchy themes/branding |
 | `opencode/` | OpenCode AI config |
@@ -50,6 +51,7 @@ After changing configs, apply them:
 | **Hyprland** | `hyprctl reload` |
 | **Waybar** | Auto-reloads on change (or `killall waybar && waybar &`) |
 | **Kitty** | Changes apply on new window (or `ctrl+shift+f5`) |
+| **Neovim** | Restart Neovim or run `:Lazy sync` after plugin changes |
 | **Zsh/Oh-My-Posh** | `source ~/.zshrc` or open new terminal |
 | **Systemd units** | `systemctl --user daemon-reload && systemctl --user restart <service>` |
 
@@ -57,10 +59,10 @@ After changing configs, apply them:
 
 ```bash
 # Re-stow a package after pulling changes
-stow -R zsh
+stow -R zsh nvim
 
 # Preview what stow would do (dry run)
-stow -n -v hypr
+stow -n -v hypr nvim
 
 # Check aliases defined
 cat ~/.commonrc
