@@ -2,9 +2,9 @@
 name: loki-code-reviewer
 description: Ruthless code review auditor for pre-commit and post-build phases.
 mode: subagent
-model: openai/gpt-5.2
+model: google/gemini-3.1-pro-preview
 temperature: 0.1
-variant: xhigh
+variant: high
 tools:
   write: false
   edit: false
