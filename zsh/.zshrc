@@ -127,3 +127,18 @@ export PATH=~/.local/bin:$PATH
 export PATH="$PATH:/home/jt/.lmstudio/bin"
 # End of LM Studio CLI section
 
+# Toggle System Sleep (Server Mode)
+servermode() {
+    if [[ "$1" == "on" ]]; then
+        sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+        echo "🚀 Server Mode ENABLED: System will NOT sleep. (Screen will still lock via Hypridle)"
+    elif [[ "$1" == "off" ]]; then
+        sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+        echo "💤 Server Mode DISABLED: Standard power management restored."
+    else
+        echo "Usage: servermode [on|off]"
+        # Check current status
+        systemctl is-active sleep.target >/dev/null && echo "Status: Normal" || echo "Status: Server Mode (Inhibited)"
+    fi
+}
+
