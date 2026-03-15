@@ -32,6 +32,10 @@
       "temperature": 0.1,
       "mode": "primary"
     },
+    "explore": {
+      "model": "github-copilot/grok-code-fast-1",
+      "mode": "subagent"
+    },
     "quick": {
       "model": "google/gemini-3-flash-preview",
       "mode": "primary"
