@@ -127,6 +127,9 @@ export PATH=~/.local/bin:$PATH
 export PATH="$PATH:/home/jt/.lmstudio/bin"
 # End of LM Studio CLI section
 
+alias task="go-task"
+eval "$(task --completion zsh)"
+
 # Toggle System Sleep (Server Mode)
 servermode() {
     if [[ "$1" == "on" ]]; then
