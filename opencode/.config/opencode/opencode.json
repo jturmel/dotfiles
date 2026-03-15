@@ -36,6 +36,13 @@
       "model": "github-copilot/grok-code-fast-1",
       "mode": "subagent"
     },
+    "code-reviewer": {
+      "name": "Loki",
+      "model": "google/gemini-3.1-pro-preview",
+      "reasoningEffort": "high",
+      "temperature": 0.1,
+      "mode": "primary"
+    },
     "quick": {
       "model": "google/gemini-3-flash-preview",
       "mode": "primary"
