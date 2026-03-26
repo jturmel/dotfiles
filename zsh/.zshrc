@@ -137,18 +137,61 @@ export PATH="$PATH:/home/jt/.lmstudio/bin"
 alias task="go-task"
 eval "$(task --completion zsh)"
 
-# Toggle System Sleep (Server Mode)
+# Toggle Server Mode (keep awake while open, preserve lid/manual suspend)
 servermode() {
-    if [[ "$1" == "on" ]]; then
-        sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-        echo "🚀 Server Mode ENABLED: System will NOT sleep. (Screen will still lock via Hypridle)"
-    elif [[ "$1" == "off" ]]; then
-        sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
-        echo "💤 Server Mode DISABLED: Standard power management restored."
-    else
-        echo "Usage: servermode [on|off]"
-        # Check current status
-        systemctl is-active sleep.target >/dev/null && echo "Status: Normal" || echo "Status: Server Mode (Inhibited)"
-    fi
-}
+    local unit="servermode-idle-inhibit.service"
 
+    case "$1" in
+        on)
+            if systemctl --user is-active --quiet "$unit"; then
+                echo "Server Mode already enabled: idle suspend is inhibited; lid close and manual suspend still work."
+                return 0
+            fi
+
+            if systemctl --user start "$unit"; then
+                echo "Server Mode enabled: idle suspend is inhibited; lid close and manual suspend still work."
+            else
+                echo "Failed to enable Server Mode. Check: systemctl --user status $unit" >&2
+                return 1
+            fi
+            ;;
+        off)
+            if ! systemctl --user is-active --quiet "$unit"; then
+                echo "Server Mode already disabled: normal suspend behavior is active."
+                return 0
+            fi
+
+            if systemctl --user stop "$unit"; then
+                echo "Server Mode disabled: normal suspend behavior is active."
+            else
+                echo "Failed to disable Server Mode. Check: systemctl --user status $unit" >&2
+                return 1
+            fi
+            ;;
+        "")
+            echo "Usage: servermode [on|off]"
+            if systemctl --user is-active --quiet "$unit"; then
+                echo "Status: enabled (idle suspend inhibited; lid/manual suspend allowed)"
+            else
+                echo "Status: disabled (normal suspend behavior active)"
+            fi
+            ;;
+        *)
+            echo "Usage: servermode [on|off]" >&2
+            return 1
+            ;;
+    esac
+}
+export PATH=$PATH:$HOME/.maestro/bin
+
+### Android SDK setup ###
+export ANDROID_SDK_ROOT="$HOME/Android/Sdk"
+export ANDROID_HOME="$ANDROID_SDK_ROOT"
+export ANDROID_AVD_HOME="$HOME/.config/.android/avd"
+export PATH="$PATH:$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin"
+### End Android SDK setup ###
+
+### Java 21 for Android builds ###
+export JAVA_HOME="/home/jt/.local/share/mise/installs/java/temurin-21.0.10+7.0.LTS"
+export PATH="$JAVA_HOME/bin:$PATH"
+### End Java 21 for Android builds ###
