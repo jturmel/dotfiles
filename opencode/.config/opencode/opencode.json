@@ -90,7 +90,7 @@
       ],
       "environment": {
         "BRAVE_MCP_TRANSPORT": "stdio",
-        "BRAVE_API_KEY": "BSAClK2gOBUmGUE7kClh3l69a8RBwy1"
+        "BRAVE_API_KEY": ""
       }
     },
     "agentation": {
