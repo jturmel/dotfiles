@@ -4,7 +4,8 @@
   "plugin": [
     "opencode-gemini-auth@latest",
     "superpowers@git+https://github.com/obra/superpowers.git",
-    "cleat@git+https://github.com/jturmel/cleat.git"
+    "cleat@git+https://github.com/jturmel/cleat.git",
+    "opencode-ralph-loop"
   ],
   "provider": {
     "google": {
@@ -46,13 +47,19 @@
       "mode": "primary"
     },
     "quick": {
-      "model": "google/gemini-3-flash-preview",
+      "model": "fireworksai/kimi-k2p5-turbo",
       "mode": "primary"
     }
   },
   "formatter": {
     "ruff": {
       "enabled": true
+    }
+  },
+  "permission": {
+    "external_directory": {
+      "/tmp": "allow",
+      "env:$TMPDIR": "allow"
     }
   },
   "mcp": {
@@ -71,8 +78,31 @@
       "type": "local",
       "command": [
         "npx",
-        "@playwright/mcp@latest"
+        "@playwright/mcp@latest",
+        "--headless"
       ]
+    },
+    "brave-search": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "docker", "run", "-i", "--rm", "-e", "BRAVE_API_KEY", "-e", "BRAVE_MCP_TRANSPORT", "docker.io/mcp/brave-search"
+      ],
+      "environment": {
+        "BRAVE_MCP_TRANSPORT": "stdio",
+        "BRAVE_API_KEY": "BSAClK2gOBUmGUE7kClh3l69a8RBwy1"
+      }
+    },
+    "agentation": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "agentation-mcp",
+        "server"
+      ],
+      "enabled": false,
+      "environment": {}
     }
   }
 }
