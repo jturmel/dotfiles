@@ -4,7 +4,7 @@
   "plugin": [
     "opencode-gemini-auth@latest",
     "superpowers@git+https://github.com/obra/superpowers.git",
-    "cleat@git+https://github.com/jturmel/cleat.git#v0.3.0",
+    "cleat@git+https://github.com/jturmel/cleat.git#v0.4.0",
     "opencode-ralph-loop"
   ],
   "provider": {
@@ -36,6 +36,7 @@
       "mode": "primary"
     },
     "build_quick": {
+      "name": "Build Quick",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "mode": "primary"
     },
