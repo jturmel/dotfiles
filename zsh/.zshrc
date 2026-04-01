@@ -30,6 +30,9 @@ ZSH_THEME="robbyrussell"
 # If set to an empty array, this variable will have no effect.
 # ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
+source ~/.env
+export BRAVE_API_KEY="$BRAVE_API_KEY"
+
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -195,3 +198,4 @@ export PATH="$PATH:$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$
 export JAVA_HOME="/home/jt/.local/share/mise/installs/java/temurin-21.0.10+7.0.LTS"
 export PATH="$JAVA_HOME/bin:$PATH"
 ### End Java 21 for Android builds ###
+

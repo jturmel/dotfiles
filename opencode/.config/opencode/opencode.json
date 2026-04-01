@@ -30,7 +30,6 @@
       "mode": "primary"
     },
     "build": {
-      "name": "Build GPT",
       "model": "openai/gpt-5.3-codex",
       "reasoningEffort": "medium",
       "temperature": 0.1,
@@ -91,7 +90,7 @@
       ],
       "environment": {
         "BRAVE_MCP_TRANSPORT": "stdio",
-        "BRAVE_API_KEY": ""
+        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
       }
     },
     "agentation": {
