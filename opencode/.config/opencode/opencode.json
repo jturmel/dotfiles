@@ -4,7 +4,7 @@
   "plugin": [
     "opencode-gemini-auth@latest",
     "superpowers@git+https://github.com/obra/superpowers.git",
-    "cleat@git+https://github.com/jturmel/cleat.git",
+    "cleat@git+https://github.com/jturmel/cleat.git#v0.3.0",
     "opencode-ralph-loop"
   ],
   "provider": {
@@ -45,7 +45,7 @@
       "mode": "subagent"
     },
     "code-reviewer": {
-      "name": "Loki",
+      "name": "Code Reviewer",
       "model": "google/gemini-3.1-pro-preview",
       "reasoningEffort": "high",
       "temperature": 0.1,

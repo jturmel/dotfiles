@@ -1,5 +1,5 @@
 ---
-name: loki-code-reviewer
+name: code-reviewer
 description: Ruthless code review auditor for pre-commit and post-build phases.
 mode: subagent
 model: google/gemini-3.1-pro-preview
