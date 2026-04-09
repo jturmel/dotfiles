@@ -30,7 +30,9 @@ ZSH_THEME="robbyrussell"
 # If set to an empty array, this variable will have no effect.
 # ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
-export BRAVE_API_KEY="$BRAVE_API_KEY"
+_1password_env_file="${XDG_RUNTIME_DIR:-/run/user/$UID}/1password-env-sync/current.sh"
+[[ -r "$_1password_env_file" ]] && source "$_1password_env_file"
+unset _1password_env_file
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -126,9 +128,6 @@ eval "$(oh-my-posh init zsh --config ~/.omp.quick-term-as-dracula.json)"
 ## Completion scripts setup. Remove the following line to uninstall
 [[ -f /home/jt/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/jt/.config/.dart-cli-completion/zsh-config.zsh || true
 ## [/Completion]
-
-# 1Password environment variables are synced into the user session by
-# ~/.local/bin/1password-env-sync via systemd --user.
 
 export PATH=~/.local/bin:$PATH
 
