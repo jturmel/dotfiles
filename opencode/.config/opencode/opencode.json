@@ -55,8 +55,8 @@
     },
     "code-reviewer": {
       "name": "Code Reviewer",
-      "model": "google/gemini-3.1-pro-preview",
-      "reasoningEffort": "high",
+      "model": "openai/gpt-5.4",
+      "reasoningEffort": "xhigh",
       "temperature": 0.1,
       "mode": "primary"
     }
