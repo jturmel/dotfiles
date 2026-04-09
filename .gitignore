@@ -8,3 +8,6 @@
 # OS
 .DS_Store
 Thumbs.db
+
+onepassword/.config/1password-env-sync.conf
+
