@@ -197,3 +197,8 @@ export PATH="$PATH:$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$
 export JAVA_HOME="/home/jt/.local/share/mise/installs/java/temurin-21.0.10+7.0.LTS"
 export PATH="$JAVA_HOME/bin:$PATH"
 ### End Java 21 for Android builds ###
+
+if [[ -d "$HOME/.atuin" ]] && [[ -r "$HOME/.atuin/bin/env" ]] && command -v atuin >/dev/null 2>&1; then
+  . "$HOME/.atuin/bin/env"
+  eval "$(atuin init zsh)"
+fi
