@@ -38,3 +38,4 @@
 	program = /opt/1Password/op-ssh-sign
 [core]
 	excludesFile = ~/.gitignore
+	editor = nvim
