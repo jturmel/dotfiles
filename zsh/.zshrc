@@ -198,7 +198,9 @@ export JAVA_HOME="/home/jt/.local/share/mise/installs/java/temurin-21.0.10+7.0.L
 export PATH="$JAVA_HOME/bin:$PATH"
 ### End Java 21 for Android builds ###
 
-if [[ -d "$HOME/.atuin" ]] && [[ -r "$HOME/.atuin/bin/env" ]] && command -v atuin >/dev/null 2>&1; then
+if [[ -r "$HOME/.atuin/bin/env" ]]; then
   . "$HOME/.atuin/bin/env"
-  eval "$(atuin init zsh)"
+  if [[ -d "$HOME/.atuin" ]]; then
+    eval "$(atuin init zsh)"
+  fi
 fi
