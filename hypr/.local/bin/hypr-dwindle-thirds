@@ -1,0 +1,299 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET_MONITOR_MODEL="${HYPR_DWINDLE_THIRDS_MONITOR_MODEL:-P40WD-40}"
+TARGET_MONITOR_DESCRIPTION="${HYPR_DWINDLE_THIRDS_MONITOR_DESCRIPTION:-Lenovo Group Limited P40WD-40}"
+GEOMETRY_TOLERANCE="${HYPR_DWINDLE_THIRDS_TOLERANCE:-80}"
+RATIO_TOLERANCE="${HYPR_DWINDLE_THIRDS_RATIO_TOLERANCE:-0.05}"
+EVENT_DELAY="${HYPR_DWINDLE_THIRDS_DELAY:-0.12}"
+LEFT_THIRD_RATIO="${HYPR_DWINDLE_THIRDS_LEFT_RATIO:-0.667}"
+RIGHT_THIRD_RATIO="${HYPR_DWINDLE_THIRDS_RIGHT_RATIO:-1.333}"
+
+abs_jq='def abs: if . < 0 then -. else . end;'
+
+monitor_is_lenovo_json() {
+  local monitors_json="$1"
+  local monitor_id="$2"
+
+  jq -r \
+    --argjson id "$monitor_id" \
+    --arg model "$TARGET_MONITOR_MODEL" \
+    --arg desc "$TARGET_MONITOR_DESCRIPTION" \
+    'any(.[]; .id == $id and ((.model // "") == $model or ((.description // "") | contains($desc))))' \
+    <<<"$monitors_json"
+}
+
+workspace_was_two_vertical_halves_json() {
+  local clients_json="$1"
+  local monitors_json="$2"
+  local workspace_id="$3"
+
+  jq -r \
+    --argjson monitors "$monitors_json" \
+    --argjson ws "$workspace_id" \
+    --arg model "$TARGET_MONITOR_MODEL" \
+    --arg desc "$TARGET_MONITOR_DESCRIPTION" \
+    --argjson tol "$GEOMETRY_TOLERANCE" \
+    --argjson ratio_tol "$RATIO_TOLERANCE" \
+    "$abs_jq
+    def close(a; b): ((a - b) | abs) <= \$tol;
+    def close_fraction(width; total; target): (((width / total) - target) | abs) <= \$ratio_tol;
+    def tiled:
+      map(select(
+        .mapped == true and
+        .hidden == false and
+        .floating == false and
+        (.fullscreen // 0) == 0 and
+        .workspace.id == \$ws
+      ));
+    def lenovo_monitor(id):
+      \$monitors | any(.[]; .id == id and (((.model // \"\") == \$model) or ((.description // \"\") | contains(\$desc))));
+
+    tiled as \$windows |
+    if (\$windows | length) != 2 then
+      false
+    else
+      (\$windows | sort_by(.at[0])) as \$sorted |
+      \$sorted[0] as \$left |
+      \$sorted[1] as \$right |
+      ((\$right.at[0] + \$right.size[0]) - \$left.at[0]) as \$total_width |
+      (\$left.monitor == \$right.monitor) and
+      lenovo_monitor(\$left.monitor) and
+      close(\$left.at[1]; \$right.at[1]) and
+      close(\$left.size[1]; \$right.size[1]) and
+      close_fraction(\$left.size[0]; \$total_width; 0.5) and
+      close_fraction(\$right.size[0]; \$total_width; 0.5) and
+      (\$left.at[0] < \$right.at[0]) and
+      ((\$left.at[0] + \$left.size[0]) <= (\$right.at[0] + \$tol))
+    end" \
+    <<<"$clients_json"
+}
+
+workspace_tiled_count_json() {
+  local clients_json="$1"
+  local workspace_id="$2"
+
+  jq -r \
+    --argjson ws "$workspace_id" \
+    'map(select(.mapped == true and .hidden == false and .floating == false and (.fullscreen // 0) == 0 and .workspace.id == $ws)) | length' \
+    <<<"$clients_json"
+}
+
+workspace_was_three_vertical_thirds_json() {
+  local clients_json="$1"
+  local monitors_json="$2"
+  local workspace_id="$3"
+
+  jq -r \
+    --argjson monitors "$monitors_json" \
+    --argjson ws "$workspace_id" \
+    --arg model "$TARGET_MONITOR_MODEL" \
+    --arg desc "$TARGET_MONITOR_DESCRIPTION" \
+    --argjson tol "$GEOMETRY_TOLERANCE" \
+    --argjson ratio_tol "$RATIO_TOLERANCE" \
+    "$abs_jq
+    def close(a; b): ((a - b) | abs) <= \$tol;
+    def close_fraction(width; total; target): (((width / total) - target) | abs) <= \$ratio_tol;
+    def tiled:
+      map(select(
+        .mapped == true and
+        .hidden == false and
+        .floating == false and
+        (.fullscreen // 0) == 0 and
+        .workspace.id == \$ws
+      ));
+    def lenovo_monitor(id):
+      \$monitors | any(.[]; .id == id and (((.model // \"\") == \$model) or ((.description // \"\") | contains(\$desc))));
+    def max_right: map(.at[0] + .size[0]) | max;
+    def min_left: map(.at[0]) | min;
+
+    tiled as \$windows |
+    if (\$windows | length) != 3 then
+      false
+    else
+      (\$windows | sort_by(.at[0])) as \$sorted |
+      \$sorted[0] as \$first |
+      ((\$windows | max_right) - (\$windows | min_left)) as \$total_width |
+      all(\$windows[]; .monitor == \$first.monitor) and
+      lenovo_monitor(\$first.monitor) and
+      all(\$windows[]; close(.at[1]; \$first.at[1]) and close(.size[1]; \$first.size[1])) and
+      all(\$windows[]; close_fraction(.size[0]; \$total_width; 0.3333333333)) and
+      ((\$sorted[0].at[0] + \$sorted[0].size[0]) <= (\$sorted[1].at[0] + \$tol)) and
+      ((\$sorted[1].at[0] + \$sorted[1].size[0]) <= (\$sorted[2].at[0] + \$tol))
+    end" \
+    <<<"$clients_json"
+}
+
+resize_plan_for_three_json() {
+  local clients_json="$1"
+  local workspace_id="$2"
+
+  jq -r \
+    --argjson ws "$workspace_id" \
+    --arg left_ratio "$LEFT_THIRD_RATIO" \
+    --arg right_ratio "$RIGHT_THIRD_RATIO" \
+    "$abs_jq
+    def tiled:
+      map(select(
+        .mapped == true and
+        .hidden == false and
+        .floating == false and
+        (.fullscreen // 0) == 0 and
+        .workspace.id == \$ws
+      ));
+    def max_right: map(.at[0] + .size[0]) | max;
+    def min_left: map(.at[0]) | min;
+    def same_track:
+      (sort_by(.at[0]) | .[0]) as \$first |
+      all(.[]; (((.at[1] - \$first.at[1]) | abs) <= 80) and (((.size[1] - \$first.size[1]) | abs) <= 80));
+
+    tiled as \$windows |
+    if (\$windows | length) != 3 or ((\$windows | same_track) | not) then
+      empty
+    else
+      (\$windows | sort_by(.at[0])) as \$sorted |
+      (\$windows | sort_by(.size[0]) | reverse | .[0]) as \$largest |
+      (\$windows | max_right) as \$right |
+      (\$windows | min_left) as \$left |
+      ((\$left + \$right) / 2) as \$midpoint |
+      ((\$largest.at[0] + (\$largest.size[0] / 2)) > \$midpoint) as \$largest_is_right |
+      if \$largest_is_right then
+        \"\(\$sorted[0].address) 1.0\n\(\$largest.address) \(\$right_ratio)\"
+      else
+        \"\(\$sorted[1].address) 1.0\n\(\$largest.address) \(\$left_ratio)\"
+      end
+    end" \
+    <<<"$clients_json"
+}
+
+resize_plan_for_two_json() {
+  local clients_json="$1"
+  local workspace_id="$2"
+
+  jq -r \
+    --argjson ws "$workspace_id" \
+    'map(select(.mapped == true and .hidden == false and .floating == false and (.fullscreen // 0) == 0 and .workspace.id == $ws))
+    | if length == 2 then (sort_by(.size[0]) | reverse | .[0].address + " 1.0") else empty end' \
+    <<<"$clients_json"
+}
+
+workspace_ids_json() {
+  local clients_json="$1"
+
+  jq -r \
+    '.[] | select(.mapped == true and .hidden == false and .floating == false and (.fullscreen // 0) == 0) | .workspace.id' \
+    <<<"$clients_json" | sort -nu
+}
+
+should_update_previous_for_event() {
+  local event="$1"
+
+  case "$event" in
+    windowtitle*|windowtitlev2*|urgent*)
+      printf 'false\n'
+      ;;
+    *)
+      printf 'true\n'
+      ;;
+  esac
+}
+
+apply_resize_plan() {
+  local plan="$1"
+  local address ratio
+
+  if [[ -z "$plan" ]]; then
+    return 0
+  fi
+
+  while read -r address ratio; do
+    if [[ -z "${address:-}" || -z "${ratio:-}" ]]; then
+      continue
+    fi
+
+    hyprctl --quiet dispatch focuswindow "address:$address"
+    hyprctl --quiet dispatch layoutmsg "splitratio $ratio exact"
+    sleep 0.05
+  done <<<"$plan"
+}
+
+handle_openwindow() {
+  local previous_clients="$1"
+  local previous_monitors="$2"
+  local current_clients="$3"
+  local workspace_id previous_ok current_count plan
+
+  while IFS= read -r workspace_id; do
+    [[ -n "$workspace_id" ]] || continue
+
+    previous_ok="$(workspace_was_two_vertical_halves_json "$previous_clients" "$previous_monitors" "$workspace_id")"
+    current_count="$(workspace_tiled_count_json "$current_clients" "$workspace_id")"
+
+    if [[ "$previous_ok" == "true" && "$current_count" == "3" ]]; then
+      plan="$(resize_plan_for_three_json "$current_clients" "$workspace_id")"
+      apply_resize_plan "$plan"
+    fi
+  done < <(workspace_ids_json "$current_clients")
+}
+
+handle_closewindow() {
+  local previous_clients="$1"
+  local previous_monitors="$2"
+  local current_clients="$3"
+  local workspace_id previous_ok current_count plan
+
+  while IFS= read -r workspace_id; do
+    [[ -n "$workspace_id" ]] || continue
+
+    previous_ok="$(workspace_was_three_vertical_thirds_json "$previous_clients" "$previous_monitors" "$workspace_id")"
+    current_count="$(workspace_tiled_count_json "$current_clients" "$workspace_id")"
+
+    if [[ "$previous_ok" == "true" && "$current_count" == "2" ]]; then
+      plan="$(resize_plan_for_two_json "$current_clients" "$workspace_id")"
+      apply_resize_plan "$plan"
+    fi
+  done < <(workspace_ids_json "$current_clients")
+}
+
+socket_path() {
+  if [[ -z "${XDG_RUNTIME_DIR:-}" || -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    return 1
+  fi
+
+  printf '%s/hypr/%s/.socket2.sock\n' "$XDG_RUNTIME_DIR" "$HYPRLAND_INSTANCE_SIGNATURE"
+}
+
+main() {
+  local socket previous_clients previous_monitors current_clients event
+
+  command -v hyprctl >/dev/null
+  command -v jq >/dev/null
+  command -v socat >/dev/null
+
+  socket="$(socket_path)"
+  [[ -S "$socket" ]]
+
+  previous_clients="$(hyprctl -j clients)"
+  previous_monitors="$(hyprctl -j monitors)"
+
+  socat -U - "UNIX-CONNECT:$socket" | while IFS= read -r event; do
+    if [[ "$event" == openwindow* ]]; then
+      sleep "$EVENT_DELAY"
+      current_clients="$(hyprctl -j clients)"
+      handle_openwindow "$previous_clients" "$previous_monitors" "$current_clients"
+    elif [[ "$event" == closewindow* ]]; then
+      sleep "$EVENT_DELAY"
+      current_clients="$(hyprctl -j clients)"
+      handle_closewindow "$previous_clients" "$previous_monitors" "$current_clients"
+    fi
+
+    if [[ "$(should_update_previous_for_event "$event")" == "true" ]]; then
+      previous_clients="$(hyprctl -j clients)"
+      previous_monitors="$(hyprctl -j monitors)"
+    fi
+  done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
