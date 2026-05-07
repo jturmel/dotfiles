@@ -173,7 +173,7 @@ resize_plan_for_two_json() {
   jq -r \
     --argjson ws "$workspace_id" \
     'map(select(.mapped == true and .hidden == false and .floating == false and (.fullscreen // 0) == 0 and .workspace.id == $ws))
-    | if length == 2 then (sort_by(.at[0]) | .[0].address + " 1.0") else empty end' \
+    | if length == 2 then (sort_by(.size[0]) | reverse | .[0].address + " 1.0") else empty end' \
     <<<"$clients_json"
 }
 
@@ -189,7 +189,7 @@ should_update_previous_for_event() {
   local event="$1"
 
   case "$event" in
-    windowtitle*|windowtitlev2*)
+    windowtitle*|windowtitlev2*|urgent*)
       printf 'false\n'
       ;;
     *)
