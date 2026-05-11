@@ -7,9 +7,8 @@ OpenCode terminal AI assistant configuration with custom agents, model routing, 
 ```
 opencode/.config/opencode/
 ├── opencode.json       # Main config (plugins, MCP servers, formatters)
-├── oh-my-opencode.json # Agent/category model assignments
 ├── agents/             # Custom agent definitions
-│   └── momus-code-reviewer.md
+│   └── code-reviewer.md
 └── skills/             # Injected workflows
     └── code-review.md
 ```
@@ -25,7 +24,7 @@ opencode/.config/opencode/
 
 ## KEY CONFIGS
 
-**Plugins**: `oh-my-opencode`, `opencode-gemini-auth`
+**Plugins**: `opencode-gemini-auth`
 
 **MCP Servers**:
 - `playwright` (local) - Browser automation
@@ -33,16 +32,6 @@ opencode/.config/opencode/
 - `crawl4ai` (remote, disabled)
 
 **Formatters**: `ruff` for Python
-
-## AGENTS (oh-my-opencode.json)
-
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| sisyphus | claude-opus-4.5 | Main orchestrator |
-| oracle | gpt-5.2 | High-IQ consultation |
-| explore | grok-code-fast-1 | Codebase search |
-| librarian | minimax-m2.5-free | External docs/refs |
-| momus-code-reviewer | gpt-5.2 (xhigh) | Pre-commit audit |
 
 ## CUSTOM AGENT PATTERN
 
