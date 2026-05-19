@@ -204,3 +204,7 @@ if [[ -r "$HOME/.atuin/bin/env" ]]; then
     eval "$(atuin init zsh)"
   fi
 fi
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/jt/.local/bin:$PATH"

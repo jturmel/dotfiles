@@ -4,8 +4,7 @@
   "plugin": [
     "opencode-gemini-auth@latest",
     "superpowers@git+https://github.com/obra/superpowers.git",
-    "cleat@git+https://github.com/jturmel/cleat.git#v0.5.0",
-    "opencode-ralph-loop"
+    "cleat@git+https://github.com/jturmel/cleat.git#v0.5.0"
   ],
   "provider": {
     "google": {
