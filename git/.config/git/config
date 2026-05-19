@@ -31,7 +31,7 @@
 [user]
 	name = Josh Turmel
 	email = jturmel@gmail.com
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILodSdNirfDugRFoKqWzBgqRI+QbKTGSvp8YUII4RFuw
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMcVcgfK+cb0n8wb5IDnuegNEJGoOW+eWZ/dGcG4hUa
 [gpg]
 	format = ssh
 [gpg "ssh"]
@@ -39,3 +39,9 @@
 [core]
 	excludesFile = ~/.gitignore
 	editor = nvim
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
