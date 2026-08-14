@@ -39,8 +39,12 @@ dotfiles/
 | Install single package | `stow -R <package>` | e.g., `stow -R zsh` |
 | Shell aliases | `zsh/.commonrc` | `lzd`, `lzg` |
 | Zsh sourcing order | `zsh/.zshrc` | p10k → OMZ → .commonrc → omp |
-| Hyprland keybinds | `hypr/.config/hypr/keybindings.conf` | |
-| Hyprland monitors | `hypr/.config/hypr/monitors_custom.conf` | |
+| Hyprland loader | `hypr/.config/hypr/hyprland.lua` | Omarchy Quattro entry point |
+| Hyprland keybinds | `hypr/.config/hypr/bindings.lua` | |
+| Hyprland monitors | `hypr/.config/hypr/monitors.lua` | |
+| Hyprland window rules | `hypr/.config/hypr/windows.lua` | |
+| Hyprland workspaces | `hypr/.config/hypr/workspaces.lua` | |
+| Omarchy shell / idle | `omarchy/.config/omarchy/shell.json` | Bar, screensaver, and lock timing |
 | AI agent config | `opencode/` | See opencode/AGENTS.md |
 
 ## CONVENTIONS
