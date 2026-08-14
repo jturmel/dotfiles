@@ -17,7 +17,7 @@ opencode/.config/opencode/
 
 | Task | Location |
 |------|----------|
-| Change default models | `oh-my-opencode.json` → `agents` or `categories` |
+| Change default models | `opencode.json` → `agent` or provider settings |
 | Add MCP server | `opencode.json` → `mcp` |
 | Create custom agent | `agents/<name>.md` |
 | Create skill/workflow | `skills/<name>.md` |
@@ -65,5 +65,4 @@ description: <when to invoke>
 ## CONVENTIONS
 
 - Skills inject into parent agents via `@agent-name` calls
-- Code review skill requires PASS from momus-code-reviewer before commit
 - Read-only agents disable write/edit/bash tools in frontmatter
