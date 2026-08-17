@@ -1,0 +1,10 @@
+[Unit]
+Description=Apply display presets on AC and battery transitions
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/power-source-display
+Restart=on-failure
+RestartSec=2

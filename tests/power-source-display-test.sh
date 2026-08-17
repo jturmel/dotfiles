@@ -65,4 +65,9 @@ if apply_current_power_state; then
   exit 1
 fi
 
+grep -F 'ExecStart=%h/.local/bin/power-source-display' \
+  "$REPO_ROOT/systemd/.config/systemd/user/power-source-display.service"
+grep -F 'o.launch_on_start("systemctl --user start power-source-display.service")' \
+  "$REPO_ROOT/hypr/.config/hypr/autostart.lua"
+
 echo 'power-source-display tests passed'
