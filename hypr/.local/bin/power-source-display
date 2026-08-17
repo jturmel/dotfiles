@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+POWER_STATE_FILE=${POWER_STATE_FILE:-/sys/class/power_supply/ACAD/online}
+BRIGHTNESSCTL_BIN=${BRIGHTNESSCTL_BIN:-brightnessctl}
+HYPRCTL_BIN=${HYPRCTL_BIN:-hyprctl}
+UPOWER_BIN=${UPOWER_BIN:-upower}
+LAST_POWER_STATE=
+
+log() {
+  printf 'power-source-display: %s\n' "$*" >&2
+}
+
+apply_current_power_state() {
+  local state brightness refresh
+
+  if [[ ! -r "$POWER_STATE_FILE" ]]; then
+    log "cannot read $POWER_STATE_FILE"
+    return 1
+  fi
+
+  read -r state <"$POWER_STATE_FILE"
+  if [[ "$state" != 0 && "$state" != 1 ]]; then
+    log "unexpected AC state: $state"
+    return 1
+  fi
+
+  [[ "$state" == "$LAST_POWER_STATE" ]] && return 0
+  LAST_POWER_STATE=$state
+
+  if ! "$HYPRCTL_BIN" monitors all | grep -q '^Monitor eDP-1 '; then
+    log 'eDP-1 is unavailable; leaving displays unchanged'
+    return 0
+  fi
+
+  if [[ "$state" == 0 ]]; then
+    brightness=60
+    refresh=60
+  else
+    brightness=100
+    refresh=120
+  fi
+
+  "$BRIGHTNESSCTL_BIN" --device intel_backlight set "${brightness}%" \
+    || log "failed to set brightness to ${brightness}%"
+  "$HYPRCTL_BIN" keyword monitor "eDP-1,2880x1920@${refresh},0x0,2" \
+    || log "failed to set eDP-1 to ${refresh} Hz"
+}
+
+watch_power_source() {
+  apply_current_power_state || true
+  while IFS= read -r _; do
+    apply_current_power_state || true
+  done < <("$UPOWER_BIN" --monitor)
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  watch_power_source
+fi
