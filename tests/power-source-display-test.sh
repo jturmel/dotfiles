@@ -42,7 +42,8 @@ source "$REPO_ROOT/hypr/.local/bin/power-source-display"
 printf '0\n' >"$POWER_STATE_FILE"
 apply_current_power_state
 grep -F 'set 60%' "$COMMAND_LOG"
-grep -F 'eDP-1,2880x1920@60,0x0,2' "$COMMAND_LOG"
+grep -F 'hyprctl eval hl.monitor({ output = "eDP-1", mode = "2880x1920@60", position = "0x0", scale = 2 })' \
+  "$COMMAND_LOG"
 
 : >"$COMMAND_LOG"
 apply_current_power_state
@@ -51,7 +52,8 @@ apply_current_power_state
 printf '1\n' >"$POWER_STATE_FILE"
 apply_current_power_state
 grep -F 'set 100%' "$COMMAND_LOG"
-grep -F 'eDP-1,2880x1920@120,0x0,2' "$COMMAND_LOG"
+grep -F 'hyprctl eval hl.monitor({ output = "eDP-1", mode = "2880x1920@120", position = "0x0", scale = 2 })' \
+  "$COMMAND_LOG"
 
 : >"$COMMAND_LOG"
 printf 'Monitor DP-1 (ID 1):\n' >"$MONITORS_FILE"

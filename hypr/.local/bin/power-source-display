@@ -43,7 +43,8 @@ apply_current_power_state() {
 
   "$BRIGHTNESSCTL_BIN" --device intel_backlight set "${brightness}%" \
     || log "failed to set brightness to ${brightness}%"
-  "$HYPRCTL_BIN" keyword monitor "eDP-1,2880x1920@${refresh},0x0,2" \
+  "$HYPRCTL_BIN" eval \
+    "hl.monitor({ output = \"eDP-1\", mode = \"2880x1920@${refresh}\", position = \"0x0\", scale = 2 })" \
     || log "failed to set eDP-1 to ${refresh} Hz"
 }
 
