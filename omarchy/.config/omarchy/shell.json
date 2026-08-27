@@ -21,6 +21,9 @@
           "id": "omarchy.weather"
         },
         {
+          "id": "37signals.basecamp"
+        },
+        {
           "id": "omarchy.system-update"
         }
       ],
@@ -37,10 +40,10 @@
           "id": "omarchy.tray"
         },
         {
-          "id": "omarchy.tailscale"
+          "id": "calmasacow.grok-usage"
         },
         {
-          "id": "omarchy.agents"
+          "id": "omarchy.tailscale"
         },
         {
           "id": "omarchy.bluetooth"
@@ -55,7 +58,8 @@
           "id": "omarchy.monitor"
         },
         {
-          "id": "omarchy.power"
+          "id": "omarchy.power",
+          "showPercentage": true
         }
       ]
     },
@@ -66,6 +70,13 @@
     "lock": 300,
     "screensaver": 150
   },
-  "plugins": [],
+  "plugins": [
+    {
+      "id": "bobbynicholas.omaland"
+    },
+    {
+      "id": "io.github.atif-1402.ai-panel"
+    }
+  ],
   "version": 1
 }
