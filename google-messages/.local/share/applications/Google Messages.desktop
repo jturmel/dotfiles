@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Name=Google Messages
-Exec=omarchy-launch-or-focus-webapp "chrome-messages.google.com.*" "https://messages.google.com/web/conversations --profile-directory=Default"
+Exec=persistent-webapp launch messages
 Terminal=false
 Type=Application
 Icon=google-messages

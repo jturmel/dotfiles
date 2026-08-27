@@ -32,6 +32,9 @@ o.window({ tag = "modal_large" }, {
   dim_around = true,
 })
 
+-- Instant hide/show for persistent webapps parked on special:hidden.
+o.window({ workspace = "special:hidden" }, { no_anim = true })
+
 -- Google Messages.
 o.window("chrome-messages.google.com.*", { tag = "+google-messages" })
 o.window({ tag = "google-messages" }, {

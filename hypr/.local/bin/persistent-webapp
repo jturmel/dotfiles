@@ -1,0 +1,249 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HYPRCTL_BIN=${HYPRCTL_BIN:-hyprctl}
+LAUNCH_WEBAPP_BIN=${LAUNCH_WEBAPP_BIN:-omarchy-launch-webapp}
+HIDDEN_WORKSPACE=${HIDDEN_WORKSPACE:-special:hidden}
+GEOM_DIR=${PERSISTENT_WEBAPP_GEOM_DIR:-${XDG_RUNTIME_DIR:-/tmp}}
+
+hypr() {
+  "$HYPRCTL_BIN" "$@"
+}
+
+lookup_app() {
+  local name=$1
+  APP_FRAGMENTS=
+  APP_PROFILE=
+  APP_URL=
+
+  case "$name" in
+    messages)
+      APP_FRAGMENTS="messages.google.com"
+      APP_PROFILE="Default"
+      APP_URL="https://messages.google.com/web/conversations"
+      ;;
+    basecamp)
+      APP_FRAGMENTS="launchpad.37signals.com,3.basecamp.com"
+      APP_PROFILE="Work"
+      APP_URL="https://launchpad.37signals.com"
+      ;;
+    freshbooks)
+      APP_FRAGMENTS="my.freshbooks.com"
+      APP_PROFILE="Work"
+      APP_URL="https://my.freshbooks.com/"
+      ;;
+    *)
+      printf 'persistent-webapp: unknown app: %s\n' "$name" >&2
+      return 1
+      ;;
+  esac
+}
+
+class_matches_spec() {
+  local class=$1 initial=$2 fragments=$3 profile=$4
+  local suffix="-${profile// /_}"
+  local class_lc=${class,,}
+  local initial_lc=${initial,,}
+  local suffix_lc=${suffix,,}
+  local fragment candidate
+
+  IFS=',' read -r -a fragment_list <<<"$fragments"
+  for fragment in "${fragment_list[@]}"; do
+    fragment=${fragment,,}
+    for candidate in "$class_lc" "$initial_lc"; do
+      if [[ "$candidate" == *"$fragment"* && "$candidate" == *"$suffix_lc" && "${candidate: -${#suffix_lc}}" == "$suffix_lc" ]]; then
+        return 0
+      fi
+    done
+  done
+  return 1
+}
+
+class_matches_persistent() {
+  local class=$1 initial=${2:-}
+  local name
+
+  for name in messages basecamp freshbooks; do
+    lookup_app "$name"
+    if class_matches_spec "$class" "$initial" "$APP_FRAGMENTS" "$APP_PROFILE"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+find_app_window() {
+  local name=$1
+  lookup_app "$name"
+
+  hypr clients -j 2>/dev/null | jq -r \
+    --arg fragments "$APP_FRAGMENTS" \
+    --arg profile "$APP_PROFILE" '
+    ($profile | ascii_downcase) as $suffix |
+    [
+      .[]
+      | . as $win
+      | select(
+          $fragments
+          | split(",")
+          | map(. as $f |
+              ((($win.class // "") | ascii_downcase | contains($f)) and
+               (($win.class // "") | ascii_downcase | endswith("-" + $suffix))) or
+              ((($win.initialClass // "") | ascii_downcase | contains($f)) and
+               (($win.initialClass // "") | ascii_downcase | endswith("-" + $suffix)))
+            )
+          | any
+        )
+    ]
+    | sort_by(.focusHistoryID // 999999)
+    | .[0].address // empty
+  '
+}
+
+window_workspace() {
+  local address=$1
+  hypr clients -j 2>/dev/null | jq -r --arg address "$address" '
+    .[] | select(.address == $address) | .workspace.name // empty
+  '
+}
+
+dispatch() {
+  hypr dispatch "$@" >/dev/null
+}
+
+geometry_file_for_class() {
+  printf '%s/persistent-webapp-geom-%s.json' "$GEOM_DIR" "$1"
+}
+
+save_window_geometry() {
+  local window_json=$1
+  local class floating geom_file
+
+  class=$(jq -r '.class // empty' <<<"$window_json")
+  floating=$(jq -r '.floating // false' <<<"$window_json")
+  [[ -n "$class" && "$floating" == "true" ]] || return 0
+
+  geom_file=$(geometry_file_for_class "$class")
+  jq -c '{x: .at[0], y: .at[1], w: .size[0], h: .size[1]}' <<<"$window_json" >"$geom_file"
+}
+
+restore_hidden_window() {
+  local address=$1
+  local target_workspace=$2
+  local class geom_file x y width height
+
+  class=$(hypr clients -j 2>/dev/null | jq -r --arg address "$address" '
+    .[] | select(.address == $address) | .class // empty
+  ')
+
+  geom_file=
+  x=; y=; width=; height=
+  if [[ -n "$class" ]]; then
+    geom_file=$(geometry_file_for_class "$class")
+    if [[ -f "$geom_file" ]]; then
+      x=$(jq -r '.x // empty' "$geom_file")
+      y=$(jq -r '.y // empty' "$geom_file")
+      width=$(jq -r '.w // empty' "$geom_file")
+      height=$(jq -r '.h // empty' "$geom_file")
+    fi
+  fi
+
+  if [[ "$x" =~ ^-?[0-9]+$ && "$y" =~ ^-?[0-9]+$ && "$width" =~ ^[0-9]+$ && "$height" =~ ^[0-9]+$ ]]; then
+    # Workspace move from special:hidden overwrites floating coords, so set
+    # position in the same eval after the workspace move to avoid a visible jump.
+    hypr eval "
+local w = hl.get_window(\"address:${address}\")
+if w == nil then return end
+hl.animation({ leaf = \"specialWorkspace\", enabled = false })
+hl.dispatch(hl.dsp.window.set_prop({ prop = \"no_anim\", value = \"1\", window = w }))
+hl.dispatch(hl.dsp.window.move({ workspace = \"${target_workspace}\", follow = false, window = w }))
+hl.dispatch(hl.dsp.window.move({ x = ${x}, y = ${y}, window = w }))
+hl.dispatch(hl.dsp.window.resize({ x = ${width}, y = ${height}, window = w }))
+hl.animation({ leaf = \"specialWorkspace\", enabled = true, speed = 3, bezier = \"easeOutQuint\", style = \"slidevert\" })
+" >/dev/null
+    return 0
+  fi
+
+  dispatch "hl.dsp.window.move({ workspace = \"${target_workspace}\", follow = false, window = \"address:${address}\" })"
+}
+
+hide-active() {
+  local window_json class initial address
+
+  window_json=$(hypr activewindow -j)
+  class=$(jq -r '.class // empty' <<<"$window_json")
+  initial=$(jq -r '.initialClass // empty' <<<"$window_json")
+  address=$(jq -r '.address // empty' <<<"$window_json")
+
+  if [[ -z "$address" ]]; then
+    return 1
+  fi
+
+  if class_matches_persistent "$class" "$initial"; then
+    save_window_geometry "$window_json"
+    dispatch "hl.dsp.window.move({ workspace = \"${HIDDEN_WORKSPACE}\", follow = false, window = \"address:${address}\" })"
+    printf 'hidden %s\n' "$address"
+    return 0
+  fi
+
+  dispatch "hl.dsp.window.close()"
+}
+
+launch_app() {
+  local name=$1
+  local address workspace target_workspace
+
+  lookup_app "$name"
+  address=$(find_app_window "$name" || true)
+
+  if [[ -n "$address" ]]; then
+    workspace=$(window_workspace "$address")
+    if [[ "$workspace" == "$HIDDEN_WORKSPACE" ]]; then
+      target_workspace=$(hypr activeworkspace -j | jq -r '.id // empty')
+      if [[ "$target_workspace" =~ ^[0-9]+$ ]]; then
+        restore_hidden_window "$address" "$target_workspace"
+      fi
+    fi
+    dispatch "hl.dsp.focus({ window = \"address:${address}\" })"
+    return 0
+  fi
+
+  if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    exec "$LAUNCH_WEBAPP_BIN" "$APP_URL" --profile-directory="$APP_PROFILE"
+  fi
+  "$LAUNCH_WEBAPP_BIN" "$APP_URL" --profile-directory="$APP_PROFILE"
+}
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: persistent-webapp launch <messages|basecamp|freshbooks>
+       persistent-webapp hide-active
+       persistent-webapp matches <class> [initial-class]
+EOF
+}
+
+main() {
+  local command=${1:-}
+
+  case "$command" in
+    launch)
+      [[ $# -eq 2 ]] || { usage; return 1; }
+      launch_app "$2"
+      ;;
+    hide-active)
+      hide-active
+      ;;
+    matches)
+      [[ $# -ge 2 ]] || { usage; return 1; }
+      class_matches_persistent "$2" "${3:-}"
+      ;;
+    *)
+      usage
+      return 1
+      ;;
+  esac
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
