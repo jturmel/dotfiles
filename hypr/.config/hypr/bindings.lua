@@ -82,10 +82,12 @@ local function save_window_geometry(win)
 
   local at = win.at or {}
   local size = win.size or {}
+  local workspace = win.workspace
   local x = tonumber(at.x or at[1])
   local y = tonumber(at.y or at[2])
   local width = tonumber(size.x or size[1])
   local height = tonumber(size.y or size[2])
+  local workspace_id = workspace and tonumber(workspace.id)
   if not (x and y and width and height) then
     return
   end
@@ -95,7 +97,14 @@ local function save_window_geometry(win)
     return
   end
 
-  file:write(string.format('{"x":%d,"y":%d,"w":%d,"h":%d}\n', x, y, width, height))
+  if workspace_id and workspace_id > 0 then
+    file:write(string.format(
+      '{"x":%d,"y":%d,"w":%d,"h":%d,"workspace":%d}\n',
+      x, y, width, height, workspace_id
+    ))
+  else
+    file:write(string.format('{"x":%d,"y":%d,"w":%d,"h":%d}\n', x, y, width, height))
+  end
   file:close()
 end
 

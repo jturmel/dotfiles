@@ -124,41 +124,73 @@ save_window_geometry() {
   [[ -n "$class" && "$floating" == "true" ]] || return 0
 
   geom_file=$(geometry_file_for_class "$class")
-  jq -c '{x: .at[0], y: .at[1], w: .size[0], h: .size[1]}' <<<"$window_json" >"$geom_file"
+  jq -c '{
+    x: .at[0],
+    y: .at[1],
+    w: .size[0],
+    h: .size[1],
+    workspace: (if (.workspace.id // 0) > 0 then .workspace.id else empty end)
+  }' <<<"$window_json" >"$geom_file"
 }
 
 restore_hidden_window() {
   local address=$1
   local target_workspace=$2
-  local class geom_file x y width height
+  local class geom_file width height
+  local mon_x mon_y mon_w mon_h reserved_l reserved_t reserved_r reserved_b
+  local usable_w usable_h x y
 
   class=$(hypr clients -j 2>/dev/null | jq -r --arg address "$address" '
     .[] | select(.address == $address) | .class // empty
   ')
 
-  geom_file=
-  x=; y=; width=; height=
-  if [[ -n "$class" ]]; then
-    geom_file=$(geometry_file_for_class "$class")
-    if [[ -f "$geom_file" ]]; then
-      x=$(jq -r '.x // empty' "$geom_file")
-      y=$(jq -r '.y // empty' "$geom_file")
-      width=$(jq -r '.w // empty' "$geom_file")
-      height=$(jq -r '.h // empty' "$geom_file")
+  width=$(hypr clients -j 2>/dev/null | jq -r --arg address "$address" '
+    .[] | select(.address == $address) | .size[0] // empty
+  ')
+  height=$(hypr clients -j 2>/dev/null | jq -r --arg address "$address" '
+    .[] | select(.address == $address) | .size[1] // empty
+  ')
+
+  if [[ ! "$width" =~ ^[0-9]+$ || ! "$height" =~ ^[0-9]+$ ]]; then
+    if [[ -n "$class" ]]; then
+      geom_file=$(geometry_file_for_class "$class")
+      if [[ -f "$geom_file" ]]; then
+        width=$(jq -r '.w // empty' "$geom_file")
+        height=$(jq -r '.h // empty' "$geom_file")
+      fi
     fi
   fi
 
-  if [[ "$x" =~ ^-?[0-9]+$ && "$y" =~ ^-?[0-9]+$ && "$width" =~ ^[0-9]+$ && "$height" =~ ^[0-9]+$ ]]; then
-    # Workspace move from special:hidden overwrites floating coords, so set
-    # position in the same eval after the workspace move to avoid a visible jump.
+  read -r mon_x mon_y usable_w usable_h reserved_l reserved_t < <(
+    hypr monitors -j 2>/dev/null | jq -r '
+      .[] | select(.focused == true) |
+      ((.scale // 1) | if . < 0.1 then 1 else . end) as $scale |
+      ((.width / $scale) | floor) as $lw |
+      ((.height / $scale) | floor) as $lh |
+      ((.reserved[0] // 0) | floor) as $rl |
+      ((.reserved[1] // 0) | floor) as $rt |
+      ((.reserved[2] // 0) | floor) as $rr |
+      ((.reserved[3] // 0) | floor) as $rb |
+      [(.x // 0), (.y // 0),
+       (($lw - $rl - $rr) | if . < 1 then 1 else . end),
+       (($lh - $rt - $rb) | if . < 1 then 1 else . end),
+       $rl, $rt] | @tsv
+    '
+  )
+
+  if [[ "$usable_w" =~ ^[0-9]+$ && "$usable_h" =~ ^[0-9]+$ && "$width" =~ ^[0-9]+$ && "$height" =~ ^[0-9]+$ ]]; then
+    if ((width > usable_w)); then width=$usable_w; fi
+    if ((height > usable_h)); then height=$usable_h; fi
+    x=$((mon_x + reserved_l + usable_w / 2 - width / 2))
+    y=$((mon_y + reserved_t + usable_h / 2 - height / 2))
     hypr eval "
 local w = hl.get_window(\"address:${address}\")
 if w == nil then return end
 hl.animation({ leaf = \"specialWorkspace\", enabled = false })
 hl.dispatch(hl.dsp.window.set_prop({ prop = \"no_anim\", value = \"1\", window = w }))
 hl.dispatch(hl.dsp.window.move({ workspace = \"${target_workspace}\", follow = false, window = w }))
-hl.dispatch(hl.dsp.window.move({ x = ${x}, y = ${y}, window = w }))
 hl.dispatch(hl.dsp.window.resize({ x = ${width}, y = ${height}, window = w }))
+hl.dispatch(hl.dsp.window.move({ x = ${x}, y = ${y}, window = w }))
 hl.animation({ leaf = \"specialWorkspace\", enabled = true, speed = 3, bezier = \"easeOutQuint\", style = \"slidevert\" })
 " >/dev/null
     return 0

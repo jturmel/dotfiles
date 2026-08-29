@@ -10,9 +10,12 @@ export COMMAND_LOG="$TEST_DIR/commands.log"
 export CLIENTS_JSON="$TEST_DIR/clients.json"
 export ACTIVEWINDOW_JSON="$TEST_DIR/activewindow.json"
 export ACTIVEWORKSPACE_JSON="$TEST_DIR/activeworkspace.json"
+export MONITORS_JSON="$TEST_DIR/monitors.json"
 export LAUNCH_WEBAPP_BIN="$TEST_DIR/omarchy-launch-webapp"
 export PERSISTENT_WEBAPP_GEOM_DIR="$TEST_DIR/geom"
 mkdir -p "$PERSISTENT_WEBAPP_GEOM_DIR"
+
+printf '%s\n' '[{"focused":true,"x":0,"y":0,"width":2560,"height":1440,"reserved":[0,0,0,0]}]' >"$MONITORS_JSON"
 
 : >"$COMMAND_LOG"
 
@@ -23,6 +26,7 @@ case "$*" in
   "clients -j") cat "$CLIENTS_JSON" ;;
   "activewindow -j") cat "$ACTIVEWINDOW_JSON" ;;
   "activeworkspace -j") cat "$ACTIVEWORKSPACE_JSON" ;;
+  "monitors -j") cat "$MONITORS_JSON" ;;
   dispatch*) printf 'ok\n' ;;
   eval*) printf 'ok\n' ;;
 esac
@@ -100,6 +104,7 @@ cat >"$CLIENTS_JSON" <<'EOF'
     "class": "chrome-messages.google.com__web_conversations-Default",
     "initialClass": "chrome-messages.google.com__web_conversations-Default",
     "workspace": { "id": -98, "name": "special:hidden" },
+    "size": [480, 900],
     "focusHistoryID": 2
   },
   {
@@ -139,25 +144,66 @@ grep -F 'workspace = "special:hidden"' "$COMMAND_LOG"
 grep -F 'window = "address:0xmessages"' "$COMMAND_LOG"
 geom_file="$PERSISTENT_WEBAPP_GEOM_DIR/persistent-webapp-geom-chrome-messages.google.com__web_conversations-Default.json"
 [[ -f "$geom_file" ]]
-assert_eq "$(jq -c '{x,y,w,h}' "$geom_file")" '{"x":720,"y":120,"w":480,"h":900}' 'hide-active saves floating geometry'
+assert_eq "$(jq -c '{x,y,w,h,workspace}' "$geom_file")" '{"x":720,"y":120,"w":480,"h":900,"workspace":5}' 'hide-active saves floating geometry and workspace'
 
 : >"$COMMAND_LOG"
 launch_app messages
 grep -F 'hyprctl eval' "$COMMAND_LOG"
 grep -F 'workspace = "7"' "$COMMAND_LOG"
-grep -F 'x = 720' "$COMMAND_LOG"
-grep -F 'y = 120' "$COMMAND_LOG"
+if grep -F 'workspace = "5"' "$COMMAND_LOG"; then
+  echo 'FAIL restore should use the current workspace 7, not the saved workspace 5' >&2
+  cat "$COMMAND_LOG" >&2
+  exit 1
+fi
+if grep -E 'x = 720|y = 120|window.center' "$COMMAND_LOG"; then
+  echo 'FAIL restore should center on the current monitor, not replay saved x/y or use window.center' >&2
+  cat "$COMMAND_LOG" >&2
+  exit 1
+fi
+grep -F 'x = 1040' "$COMMAND_LOG"
+grep -F 'y = 270' "$COMMAND_LOG"
 grep -F 'x = 480' "$COMMAND_LOG"
 grep -F 'y = 900' "$COMMAND_LOG"
 ws_line=$(grep -n 'workspace = "7"' "$COMMAND_LOG" | head -1 | cut -d: -f1)
-pos_line=$(grep -n 'x = 720' "$COMMAND_LOG" | head -1 | cut -d: -f1)
+pos_line=$(grep -n 'x = 1040' "$COMMAND_LOG" | head -1 | cut -d: -f1)
 if [[ -z "$ws_line" || -z "$pos_line" || "$ws_line" -gt "$pos_line" ]]; then
-  echo "FAIL workspace move must happen before position in the same eval (ws line $ws_line, pos line $pos_line)" >&2
+  echo "FAIL workspace move must happen before center coords in the same eval (ws line $ws_line, pos line $pos_line)" >&2
   cat "$COMMAND_LOG" >&2
   exit 1
 fi
 if grep -q 'launch-webapp' "$COMMAND_LOG"; then
   echo 'FAIL launch_app messages should restore, not launch' >&2
+  exit 1
+fi
+
+printf '%s\n' '[{"focused":true,"x":0,"y":0,"width":2880,"height":1920,"scale":2,"reserved":[0,26,0,0]}]' >"$MONITORS_JSON"
+jq 'map(if .address == "0xmessages" then .size = [580, 478] else . end)' \
+  "$CLIENTS_JSON" >"$CLIENTS_JSON.tmp" && mv "$CLIENTS_JSON.tmp" "$CLIENTS_JSON"
+: >"$COMMAND_LOG"
+launch_app messages
+grep -F 'workspace = "7"' "$COMMAND_LOG"
+grep -F 'x = 430' "$COMMAND_LOG"
+grep -F 'y = 254' "$COMMAND_LOG"
+if grep -E 'x = 1150|y = 734' "$COMMAND_LOG"; then
+  echo 'FAIL restore used unscaled monitor pixels (places the window off-screen)' >&2
+  cat "$COMMAND_LOG" >&2
+  exit 1
+fi
+
+printf '%s\n' '[{"focused":true,"x":0,"y":0,"width":2560,"height":1440,"scale":1,"reserved":[0,0,0,0]}]' >"$MONITORS_JSON"
+jq 'map(if .address == "0xmessages" then .size = [3000, 2000] else . end)' \
+  "$CLIENTS_JSON" >"$CLIENTS_JSON.tmp" && mv "$CLIENTS_JSON.tmp" "$CLIENTS_JSON"
+printf '%s\n' '{"x":0,"y":0,"w":3000,"h":2000,"workspace":5}' >"$geom_file"
+: >"$COMMAND_LOG"
+launch_app messages
+grep -F 'workspace = "7"' "$COMMAND_LOG"
+grep -F 'x = 2560' "$COMMAND_LOG"
+grep -F 'y = 1440' "$COMMAND_LOG"
+grep -F 'x = 0' "$COMMAND_LOG"
+grep -F 'y = 0' "$COMMAND_LOG"
+if grep -E 'x = 3000|y = 2000' "$COMMAND_LOG"; then
+  echo 'FAIL window size must be clamped to the current monitor' >&2
+  cat "$COMMAND_LOG" >&2
   exit 1
 fi
 
