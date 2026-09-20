@@ -52,7 +52,7 @@ dotfiles/
 - **Directory structure**: Each package mirrors target path (e.g., `git/.config/git/config` → `~/.config/git/config`)
 - **Stow packages**: One dir per tool/app at repo root
 - **Conflicts**: setup.sh backs up existing files to `~/.dotfiles_backup_YYYYMMDD_HHMMSS/`
-- **Theme backgrounds**: setup.sh removes `base*` and `dracula*` from omarchy backgrounds before stow
+- **Theme backgrounds**: extra wallpapers live in `omarchy/.config/omarchy/backgrounds/dracula/` (Omarchy user overlay, not a custom theme)
 
 ## COMMANDS
 

@@ -36,7 +36,7 @@ Each directory is a stow package that mirrors the target path in `~`:
 | `kitty/` | Kitty terminal |
 | `nvim/` | Extra Neovim plugin files layered into `~/.config/nvim/` |
 | `ohmyposh/` | Oh My Posh prompt theme (Dracula) |
-| `omarchy/` | Omarchy themes/branding |
+| `omarchy/` | Omarchy shell, branding, and extra Dracula wallpapers |
 | `opencode/` | OpenCode AI config |
 | `systemd/` | User systemd units (wallpaper rotation) |
 | `waybar/` | Waybar status bar |
