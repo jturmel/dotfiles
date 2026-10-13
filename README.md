@@ -55,6 +55,16 @@ After changing configs, apply them:
 | **Zsh/Oh-My-Posh** | `source ~/.zshrc` or open new terminal |
 | **Systemd units** | `systemctl --user daemon-reload && systemctl --user restart <service>` |
 
+### Automatic thirds on the Lenovo ultrawide
+
+`hypr-dwindle-thirds`, launched by `hypr/autostart.lua`, changes two 50/50
+side-by-side tiles into equal thirds when a third tiled window opens on the
+Lenovo P40WD-40. Closing a tile from thirds restores 50/50. Custom ratios are
+left alone; the current widths are checked as well as the cached layout.
+The helper uses Hyprland's Lua dispatchers for Omarchy Quattro.
+
+Regression check: `bash tests/hypr-dwindle-thirds-test.sh`.
+
 ## Common Tasks
 
 ```bash

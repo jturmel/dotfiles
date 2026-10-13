@@ -132,6 +132,7 @@ resize_plan_for_three_json() {
     --argjson ws "$workspace_id" \
     --arg left_ratio "$LEFT_THIRD_RATIO" \
     --arg right_ratio "$RIGHT_THIRD_RATIO" \
+    --argjson ratio_tol "$RATIO_TOLERANCE" \
     "$abs_jq
     def tiled:
       map(select(
@@ -157,7 +158,10 @@ resize_plan_for_three_json() {
       (\$windows | min_left) as \$left |
       ((\$left + \$right) / 2) as \$midpoint |
       ((\$largest.at[0] + (\$largest.size[0] / 2)) > \$midpoint) as \$largest_is_right |
-      if \$largest_is_right then
+      # Resizing does not always emit an event; the cached halves can be stale.
+      if (((\$largest.size[0] / (\$right - \$left)) - 0.5) | abs) > \$ratio_tol then
+        empty
+      elif \$largest_is_right then
         \"\(\$sorted[0].address) 1.0\n\(\$largest.address) \(\$right_ratio)\"
       else
         \"\(\$sorted[1].address) 1.0\n\(\$largest.address) \(\$left_ratio)\"
@@ -211,8 +215,8 @@ apply_resize_plan() {
       continue
     fi
 
-    hyprctl --quiet dispatch focuswindow "address:$address"
-    hyprctl --quiet dispatch layoutmsg "splitratio $ratio exact"
+    hyprctl --quiet dispatch "hl.dsp.focus({window = \"address:$address\"})"
+    hyprctl --quiet dispatch "hl.dsp.layout(\"splitratio $ratio exact\")"
     sleep 0.05
   done <<<"$plan"
 }
