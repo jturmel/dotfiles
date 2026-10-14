@@ -21,10 +21,10 @@
           "id": "omarchy.weather"
         },
         {
-          "id": "37signals.basecamp"
+          "id": "omarchy.system-update"
         },
         {
-          "id": "omarchy.system-update"
+          "id": "37signals.basecamp"
         }
       ],
       "left": [
@@ -59,12 +59,12 @@
         },
         {
           "id": "omarchy.power",
-          "showPercentage": true
+          "showPercentage": false
         }
       ]
     },
     "position": "top",
-    "transparent": false
+    "transparent": true
   },
   "idle": {
     "lock": 300,

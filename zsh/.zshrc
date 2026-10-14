@@ -139,6 +139,8 @@ export PATH="$PATH:/home/jt/.lmstudio/bin"
 alias task="go-task"
 eval "$(task --completion zsh)"
 
+source <(basecamp completion zsh)
+
 # Toggle Server Mode (keep awake while open, preserve lid/manual suspend)
 servermode() {
     local unit="servermode-idle-inhibit.service"
@@ -208,3 +210,6 @@ fi
 
 # Added by Antigravity CLI installer
 export PATH="/home/jt/.local/bin:$PATH"
+
+# Keep Codex machine-readable output clean for integrations such as Basecamp.
+export PATH="/home/jt/.local/share/mise/installs/codex/latest/bin:$PATH"

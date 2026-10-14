@@ -31,3 +31,5 @@ Icon
 
 #vim
 _vimrc_local.vim
+
+**/.claude/settings.local.json

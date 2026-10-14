@@ -12,7 +12,7 @@ export BRIGHTNESSCTL_BIN="$TEST_DIR/brightnessctl"
 export HYPRCTL_BIN="$TEST_DIR/hyprctl"
 export UPOWER_BIN="$TEST_DIR/upower"
 
-printf 'Monitor eDP-1 (ID 0):\n' >"$MONITORS_FILE"
+printf 'Monitor eDP-1 (ID 0):\n2880x1920@120.00000 at 0x0\n' >"$MONITORS_FILE"
 : >"$COMMAND_LOG"
 
 cat >"$BRIGHTNESSCTL_BIN" <<'EOF'
@@ -45,10 +45,24 @@ grep -F 'set 60%' "$COMMAND_LOG"
 grep -F 'hyprctl eval hl.monitor({ output = "eDP-1", mode = "2880x1920@60", position = "0x0", scale = 2 })' \
   "$COMMAND_LOG"
 
+# Already at the target refresh: brightness still updates, modeset does not.
+: >"$COMMAND_LOG"
+LAST_POWER_STATE=
+printf 'Monitor eDP-1 (ID 0):\n2880x1920@120.00000 at 0x0\n' >"$MONITORS_FILE"
+printf '1\n' >"$POWER_STATE_FILE"
+apply_current_power_state
+grep -F 'set 100%' "$COMMAND_LOG"
+if grep -q 'hyprctl eval' "$COMMAND_LOG"; then
+  echo 'expected no modeset when eDP-1 is already 120 Hz' >&2
+  exit 1
+fi
+
 : >"$COMMAND_LOG"
 apply_current_power_state
 [[ ! -s "$COMMAND_LOG" ]]
 
+LAST_POWER_STATE=
+printf 'Monitor eDP-1 (ID 0):\n2880x1920@60.00000 at 0x0\n' >"$MONITORS_FILE"
 printf '1\n' >"$POWER_STATE_FILE"
 apply_current_power_state
 grep -F 'set 100%' "$COMMAND_LOG"

@@ -5,14 +5,31 @@ POWER_STATE_FILE=${POWER_STATE_FILE:-/sys/class/power_supply/ACAD/online}
 BRIGHTNESSCTL_BIN=${BRIGHTNESSCTL_BIN:-brightnessctl}
 HYPRCTL_BIN=${HYPRCTL_BIN:-hyprctl}
 UPOWER_BIN=${UPOWER_BIN:-upower}
+# USB-C PD on this Framework bounces ACAD/online for ~2s on plug-in.
+# Wait for a quiet stretch before applying, so 60↔120 Hz does not modeset
+# three times in a row.
+POWER_EVENT_SETTLE_SECONDS=${POWER_EVENT_SETTLE_SECONDS:-2.5}
 LAST_POWER_STATE=
 
 log() {
   printf 'power-source-display: %s\n' "$*" >&2
 }
 
+edp_refresh_hz() {
+  "$HYPRCTL_BIN" monitors all | awk '
+    /^Monitor eDP-1 / { hit = 1; next }
+    /^Monitor / { hit = 0 }
+    hit && $1 ~ /^[0-9]+x[0-9]+@/ {
+      sub(/.*@/, "", $1)
+      split($1, a, ".")
+      print a[1]
+      exit
+    }
+  '
+}
+
 apply_current_power_state() {
-  local state brightness refresh
+  local state brightness refresh current_refresh
 
   if [[ ! -r "$POWER_STATE_FILE" ]]; then
     log "cannot read $POWER_STATE_FILE"
@@ -38,11 +55,18 @@ apply_current_power_state() {
     refresh=60
   else
     brightness=100
-    refresh=60
+    refresh=120
   fi
 
-  "$BRIGHTNESSCTL_BIN" --device intel_backlight set "${brightness}%" \
+  "$BRIGHTNESSCTL_BIN" -q --device intel_backlight set "${brightness}%" \
     || log "failed to set brightness to ${brightness}%"
+
+  current_refresh=$(edp_refresh_hz)
+  if [[ "$current_refresh" == "$refresh" ]]; then
+    log "eDP-1 already ${refresh} Hz; skipping modeset"
+    return 0
+  fi
+
   "$HYPRCTL_BIN" eval \
     "hl.monitor({ output = \"eDP-1\", mode = \"2880x1920@${refresh}\", position = \"0x0\", scale = 2 })" \
     || log "failed to set eDP-1 to ${refresh} Hz"
@@ -51,6 +75,9 @@ apply_current_power_state() {
 watch_power_source() {
   apply_current_power_state || true
   while IFS= read -r _; do
+    while IFS= read -r -t "$POWER_EVENT_SETTLE_SECONDS" _; do
+      :
+    done
     apply_current_power_state || true
   done < <("$UPOWER_BIN" --monitor)
 }
